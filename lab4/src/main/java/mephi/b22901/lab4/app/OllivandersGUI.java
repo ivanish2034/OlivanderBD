@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import mephi.b22901.lab4.Buyer;
-import mephi.b22901.lab4.DatabaseInitializer;
+//import mephi.b22901.lab4.DatabaseInitializer;
 import mephi.b22901.lab4.DatabaseManager;
 import mephi.b22901.lab4.Sale;
 import mephi.b22901.lab4.Wand;
@@ -29,24 +29,42 @@ public class OllivandersGUI {
     private JFrame frame;
     private DatabaseManager dbManager;
 
+//    public OllivandersGUI() {
+//        dbManager = new DatabaseManager();
+//        initializeDatabase();
+//        initialize();
+//    }
+//
+//    private void initializeDatabase() {
+//        try (Connection conn = dbManager.getConnection()) {
+//            DatabaseInitializer.initializeDatabase(conn);
+//        } catch (SQLException e) {
+//            JOptionPane.showMessageDialog(null, 
+//                "Ошибка инициализации базы данных: " + e.getMessage(),
+//                "Database Error", 
+//                JOptionPane.ERROR_MESSAGE);
+//            System.exit(1);
+//        }
+//    }
+    
     public OllivandersGUI() {
         dbManager = new DatabaseManager();
-        initializeDatabase();
+        initializeDefaultData();  // Заменили initializeDatabase() на initializeDefaultData()
         initialize();
     }
 
-    private void initializeDatabase() {
-        try (Connection conn = dbManager.getConnection()) {
-            DatabaseInitializer.initializeDatabase(conn);
-        } catch (SQLException e) {
+    private void initializeDefaultData() {
+        try {
+            dbManager.initializeDefaultData();  // Используем новый метод из DatabaseManager
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(null, 
-                "Ошибка инициализации базы данных: " + e.getMessage(),
+                "Ошибка инициализации начальных данных: " + e.getMessage(),
                 "Database Error", 
                 JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
     }
-
+    
     private void initialize() {
         frame = new JFrame("Система учёта волшебных палочек Олливандера");
         frame.setBounds(100, 100, 800, 600);

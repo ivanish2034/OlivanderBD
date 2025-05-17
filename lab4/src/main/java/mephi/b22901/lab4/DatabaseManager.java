@@ -15,10 +15,11 @@ import java.util.Date;
 
 public class DatabaseManager {
     
-    private static final String URL = "jdbc:postgresql://localhost:5432/ollivanders_db";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "20040119Ivan";
-
+//    private static final String URL = "jdbc:postgresql://localhost:5432/ollivanders_db";
+    private static final String URL = "jdbc:postgresql://aws-0-eu-north-1.pooler.supabase.com:5432/postgres?sslmode=require";
+    private static final String USER = "postgres.bxjtwyvflpkcbduxyeja";
+//    private static final String PASSWORD = "20040119Ivan";
+    private static final String PASSWORD = "45UsRu*mos-me_ph46";
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
@@ -424,5 +425,55 @@ public class DatabaseManager {
     private void handleSQLException(SQLException e, String message) {
         System.err.println(message + ": " + e.getMessage());
         e.printStackTrace();
+    }
+    
+    public void initializeDefaultData() {
+        try (Connection conn = getConnection()) {
+            // Добавляем виды древесины, если таблица пуста
+            if (getAllWoods().isEmpty()) {
+                addWood("Драконий Гребень", "Древесина из сердца драконьего дерева, даёт мощные заклинания");
+                addWood("Лунный Ясень", "Древесина, собранная в полнолуние, усиливает защитные заклинания");
+                addWood("Фениксовый Тис", "Редкая древесина, способная восстанавливаться после повреждений");
+            }
+
+            // Добавляем виды сердцевин, если таблица пуста
+            if (getAllCores().isEmpty()) {
+                addCore("Перо феникса", "Даёт палочке способность к самовосстановлению");
+                addCore("Сердце дракона", "Обеспечивает мощные атакующие заклинания");
+                addCore("Волос вейлы", "Усиливает магию предсказаний и ясновидения");
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при инициализации начальных данных");
+        }
+    }
+
+    /**
+     * Вспомогательный метод для добавления древесины
+     */
+    private void addWood(String name, String description) {
+        String sql = "INSERT INTO wood (name, description) VALUES (?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, description);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при добавлении вида древесины: " + name);
+        }
+    }
+
+    /**
+     * Вспомогательный метод для добавления сердцевины
+     */
+    private void addCore(String name, String description) {
+        String sql = "INSERT INTO core (name, description) VALUES (?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, description);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при добавлении вида сердцевины: " + name);
+        }
     }
 }
