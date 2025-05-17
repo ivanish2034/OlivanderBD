@@ -105,6 +105,7 @@ public class OllivandersGUI {
     private void showAddWoodDialog() {
         new AddWoodDialog(frame, dbManager).showDialog();
     }
+    
     private void showAddCoreDialog() {
         new AddCoreDialog(frame, dbManager).showDialog();
     }
@@ -112,13 +113,15 @@ public class OllivandersGUI {
     private void showAddWandDialog() {
         new AddWandDialog(frame, dbManager).showDialog();
     }
+    
     private void showMoveToShopDialog() {
-    new MakeSupplyDialog(frame, dbManager).showDialog();
-}
+        new MakeSupplyDialog(frame, dbManager).showDialog();
+    }
 
-private void showSellWandDialog() {
-    new SellWandDialog(frame, dbManager).showDialog();
-}
+    private void showSellWandDialog() {
+        new SellWandDialog(frame, dbManager).showDialog();
+    }
+    
     private void trackStock() {
         StringBuilder stockInfo = new StringBuilder("=== Инвентаризация палочек ===\n\n");
         Map<Integer, String> woods = dbManager.getAllWoods();

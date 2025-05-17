@@ -15,7 +15,7 @@ public class Wand {
     private String flexibility;
     private int woodId;
     private int coreId;
-    private String status = "in_storage"; // Статусы: in_storage, in_shop, sold
+    private String status = "in_storage"; 
 
     public int getId() {
         return id;

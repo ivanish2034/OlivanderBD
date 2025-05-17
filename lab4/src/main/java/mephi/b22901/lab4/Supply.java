@@ -8,7 +8,6 @@ package mephi.b22901.lab4;
  *
  * @author ivis2
  */
-import java.sql.Date;
 
 public class Supply {
     private int id;

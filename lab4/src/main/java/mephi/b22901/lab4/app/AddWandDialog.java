@@ -96,6 +96,10 @@ public class AddWandDialog extends AbstractDialog {
 
     private int getSelectedId(JComboBox<String> comboBox, boolean isWood) {
         String selected = (String) comboBox.getSelectedItem();
-        return isWood ? dbManager.getWoodIdByName(selected) : dbManager.getCoreIdByName(selected);
+        if (isWood) {
+            return dbManager.getWoodIdByName(selected);
+        } else {
+            return dbManager.getCoreIdByName(selected);
+        }
     }
 }
