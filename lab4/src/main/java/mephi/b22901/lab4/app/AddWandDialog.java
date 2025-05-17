@@ -4,15 +4,15 @@
  */
 package mephi.b22901.lab4.app;
 
-/**
- *
- * @author ivis2
- */
 import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
 import mephi.b22901.lab4.DatabaseManager;
 import mephi.b22901.lab4.Wand;
+/**
+ *
+ * @author ivis2
+ */
 
 public class AddWandDialog extends JDialog {
     private JComboBox<String> cbWood;
@@ -36,7 +36,6 @@ public class AddWandDialog extends JDialog {
         setLayout(new GridLayout(6, 2, 10, 10));
         setSize(400, 250);
 
-        // Загрузка данных из БД
         Map<Integer, String> woods = dbManager.getAllWoods();
         Map<Integer, String> cores = dbManager.getAllCores();
 
@@ -63,11 +62,9 @@ public class AddWandDialog extends JDialog {
 
     private void addWand() {
         try {
-            // Получаем выбранные ID
             int woodId = getSelectedId(cbWood, true);
             int coreId = getSelectedId(cbCore, false);
 
-            // Проверяем, что ID валидны
             if (woodId == -1 || coreId == -1) {
                 JOptionPane.showMessageDialog(this, 
                     "Ошибка: не удалось определить ID выбранных материалов", 
@@ -75,7 +72,6 @@ public class AddWandDialog extends JDialog {
                 return;
             }
 
-            // Проверка длины палочки
             String lengthText = txtLength.getText().trim();
             double length;
             try {

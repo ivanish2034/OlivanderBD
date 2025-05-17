@@ -4,14 +4,14 @@
  */
 package mephi.b22901.lab4.app;
 
-/**
- *
- * @author ivis2
- */
 import javax.swing.*;
 import java.awt.*;
 import mephi.b22901.lab4.Buyer;
 import mephi.b22901.lab4.DatabaseManager;
+/**
+ *
+ * @author ivis2
+ */
 
 public class AddBuyerDialog extends JDialog {
     private JTextField txtFirstName;

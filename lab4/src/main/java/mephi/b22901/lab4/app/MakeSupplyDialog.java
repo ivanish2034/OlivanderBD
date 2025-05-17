@@ -4,16 +4,16 @@
  */
 package mephi.b22901.lab4.app;
 
-/**
- *
- * @author ivis2
- */
 import java.awt.*;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.*;
 import mephi.b22901.lab4.DatabaseManager;
 import mephi.b22901.lab4.Wand;
+/**
+ *
+ * @author ivis2
+ */
 
 public class MakeSupplyDialog extends JDialog {
     private JComboBox<Wand> cbWand;
@@ -30,7 +30,6 @@ public class MakeSupplyDialog extends JDialog {
         setSize(400, 200);
         setLocationRelativeTo(getParent());
 
-        // Загрузка палочек на складе (со статусом in_storage)
         List<Wand> wands = dbManager.getWandsInStorage();
 
         add(new JLabel("Выберите палочку:"));
@@ -54,7 +53,6 @@ public class MakeSupplyDialog extends JDialog {
         btnMove.addActionListener(e -> moveToShop());
         add(btnMove);
 
-        // Добавляем пустые компоненты для выравнивания
         add(new JLabel());
         add(new JLabel());
     }

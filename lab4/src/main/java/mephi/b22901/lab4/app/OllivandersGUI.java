@@ -15,12 +15,9 @@ import java.awt.Font;
 import java.awt.GridLayout;
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import mephi.b22901.lab4.Buyer;
-//import mephi.b22901.lab4.DatabaseInitializer;
 import mephi.b22901.lab4.DatabaseManager;
 import mephi.b22901.lab4.Sale;
 import mephi.b22901.lab4.Wand;
@@ -28,34 +25,16 @@ import mephi.b22901.lab4.Wand;
 public class OllivandersGUI {
     private JFrame frame;
     private DatabaseManager dbManager;
-
-//    public OllivandersGUI() {
-//        dbManager = new DatabaseManager();
-//        initializeDatabase();
-//        initialize();
-//    }
-//
-//    private void initializeDatabase() {
-//        try (Connection conn = dbManager.getConnection()) {
-//            DatabaseInitializer.initializeDatabase(conn);
-//        } catch (SQLException e) {
-//            JOptionPane.showMessageDialog(null, 
-//                "Ошибка инициализации базы данных: " + e.getMessage(),
-//                "Database Error", 
-//                JOptionPane.ERROR_MESSAGE);
-//            System.exit(1);
-//        }
-//    }
     
     public OllivandersGUI() {
         dbManager = new DatabaseManager();
-        initializeDefaultData();  // Заменили initializeDatabase() на initializeDefaultData()
+        initializeDefaultData(); 
         initialize();
     }
 
     private void initializeDefaultData() {
         try {
-            dbManager.initializeDefaultData();  // Используем новый метод из DatabaseManager
+            dbManager.initializeDefaultData(); 
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, 
                 "Ошибка инициализации начальных данных: " + e.getMessage(),
@@ -71,11 +50,9 @@ public class OllivandersGUI {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(new BorderLayout(10, 10));
 
-        // Панель с кнопками
         JPanel buttonPanel = new JPanel(new GridLayout(0, 2, 10, 10));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Создаем кнопки
         JButton btnAddBuyer = createStyledButton("Добавить покупателя", e -> showAddBuyerDialog());
         JButton btnAddWand = createStyledButton("Добавить палочку", e -> showAddWandDialog());
         JButton btnTrackStock = createStyledButton("Отслеживать запасы", e -> trackStock());
@@ -87,7 +64,6 @@ public class OllivandersGUI {
         JButton addWoodButton = createStyledButton("Добавить древесину", e -> showAddWoodDialog());
         JButton addCoreButton = createStyledButton("Добавить сердцевину", e -> showAddCoreDialog());
 
-        // Добавляем кнопки на панель
         buttonPanel.add(addWoodButton);
         buttonPanel.add(addCoreButton);
         buttonPanel.add(btnAddBuyer);
@@ -101,7 +77,6 @@ public class OllivandersGUI {
 
         frame.getContentPane().add(buttonPanel, BorderLayout.CENTER);
         
-        // Заголовок
         JLabel titleLabel = new JLabel("Магазин волшебных палочек Олливандера", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
         titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 20, 0));
@@ -143,12 +118,16 @@ public class OllivandersGUI {
         dialog.setVisible(true);
     }
     
+    private void showMoveToShopDialog() {
+        MakeSupplyDialog dialog = new MakeSupplyDialog(frame);
+        dialog.setVisible(true);
+    }
+    
     private void trackStock() {
         StringBuilder stockInfo = new StringBuilder("=== Инвентаризация палочек ===\n\n");
         Map<Integer, String> woods = dbManager.getAllWoods();
         Map<Integer, String> cores = dbManager.getAllCores();
 
-        // Палочки на складе (in_storage)
         stockInfo.append("=== На складе ===\n");
         List<Wand> storageWands = dbManager.getWandsInStorage();
         if (storageWands.isEmpty()) {
@@ -163,8 +142,6 @@ public class OllivandersGUI {
                     wand.getFlexibility()));
             }
         }
-
-        // Палочки в магазине (in_shop)
         stockInfo.append("\n=== В магазине (готовы к продаже) ===\n");
         List<Wand> shopWands = dbManager.getWandsInShop();
         if (shopWands.isEmpty()) {
@@ -179,8 +156,6 @@ public class OllivandersGUI {
                     wand.getFlexibility()));
             }
         }
-
-        // Проданные палочки (sold)
         stockInfo.append("\n=== Проданные палочки ===\n");
         List<Wand> soldWands = dbManager.getSoldWands();
         if (soldWands.isEmpty()) {
@@ -196,51 +171,6 @@ public class OllivandersGUI {
         }
 
         showScrollableMessage("Инвентаризация палочек", stockInfo.toString());
-    }
-
-    private void showMoveToShopDialog() {
-        // Получаем только палочки на складе (in_storage)
-        List<Wand> wands = dbManager.getWandsInStorage();
-
-        if (wands.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, 
-                "Нет палочек на складе для перемещения", 
-                "Информация", JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
-
-        // Создаем список для отображения
-        String[] options = wands.stream()
-            .map(w -> String.format("ID: %d (Древесина: %s, Сердцевина: %s, Длина: %.2f)", 
-                w.getId(), 
-                dbManager.getAllWoods().get(w.getWoodId()),
-                dbManager.getAllCores().get(w.getCoreId()),
-                w.getLength()))
-            .toArray(String[]::new);
-
-        // Показываем диалог выбора
-        String selected = (String) JOptionPane.showInputDialog(
-            frame,
-            "Выберите палочку для перемещения в магазин:",
-            "Перемещение в магазин",
-            JOptionPane.PLAIN_MESSAGE,
-            null,
-            options,
-            options[0]);
-
-        if (selected != null) {
-            // Извлекаем ID из выбранной строки
-            int wandId = Integer.parseInt(selected.split(" ")[1]);
-            if (dbManager.moveWandToShop(wandId)) {
-                JOptionPane.showMessageDialog(frame, 
-                    "Палочка успешно перемещена в магазин!", 
-                    "Успех", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(frame, 
-                    "Ошибка при перемещении палочки. Возможно, она уже была перемещена или продана.", 
-                    "Ошибка", JOptionPane.ERROR_MESSAGE);
-            }
-        }
     }
 
     private void showSellWandDialog() {

@@ -39,11 +39,9 @@ public class SellWandDialog extends JDialog {
         setSize(400, 300);
         setLayout(new GridLayout(4, 2, 10, 10));
         
-        // Получаем только палочки в магазине со статусом in_shop
-        List<Wand> availableWands = dbManager.getWandsInShop(); // Используем новый метод
+        List<Wand> availableWands = dbManager.getWandsInShop(); 
         List<Buyer> buyers = dbManager.getAllBuyers();
 
-        // Проверяем, есть ли данные для отображения
         if (availableWands.isEmpty() || buyers.isEmpty()) {
             String message = availableWands.isEmpty() 
                 ? "Нет палочек в магазине, готовых к продаже" 
@@ -53,25 +51,21 @@ public class SellWandDialog extends JDialog {
             return;
         }
 
-        // Выбор палочки
         add(new JLabel("Выберите палочку:"));
         cbWand = new JComboBox<>(availableWands.toArray(new Wand[0]));
         cbWand.setRenderer(new WandComboBoxRenderer(dbManager));
         add(cbWand);
 
-        // Выбор покупателя
         add(new JLabel("Выберите покупателя:"));
         cbBuyer = new JComboBox<>(buyers.toArray(new Buyer[0]));
         cbBuyer.setRenderer(new BuyerComboBoxRenderer());
         add(cbBuyer);
 
-        // Дата продажи
         add(new JLabel("Дата продажи:"));
         dateChooser = new JDateChooser();
-        dateChooser.setDate(new Date()); // Устанавливаем текущую дату по умолчанию
+        dateChooser.setDate(new Date()); 
         add(dateChooser);
 
-        // Кнопка продажи
         JButton btnSell = new JButton("Продать");
         btnSell.addActionListener(e -> sellWand());
         add(btnSell);
@@ -88,7 +82,6 @@ public class SellWandDialog extends JDialog {
                 return;
             }
 
-            // Если дата не выбрана, используем текущую дату
             if (saleDate == null) {
                 saleDate = new Date();
             }

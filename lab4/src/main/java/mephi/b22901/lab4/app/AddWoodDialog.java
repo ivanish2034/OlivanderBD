@@ -4,18 +4,14 @@
  */
 package mephi.b22901.lab4.app;
 
-/**
- *
- * @author ivis2
- */
-import javax.swing.*;
-import java.awt.*;
-import java.sql.*;
-
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
 import mephi.b22901.lab4.DatabaseManager;
+/**
+ *
+ * @author ivis2
+ */
 
 public class AddWoodDialog extends JDialog {
     private JTextField nameField;

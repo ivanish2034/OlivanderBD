@@ -15,15 +15,56 @@ import java.util.Date;
 
 public class DatabaseManager {
     
-//    private static final String URL = "jdbc:postgresql://localhost:5432/ollivanders_db";
     private static final String URL = "jdbc:postgresql://aws-0-eu-north-1.pooler.supabase.com:5432/postgres?sslmode=require";
     private static final String USER = "postgres.bxjtwyvflpkcbduxyeja";
-//    private static final String PASSWORD = "20040119Ivan";
     private static final String PASSWORD = "45UsRu*mos-me_ph46";
+    
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
+    
+    // ========== Добавление дефолтных значений для древесины и сердцевины в БД ==========
+    public void initializeDefaultData() {
+        try (Connection conn = getConnection()) {
+            if (getAllWoods().isEmpty()) {
+                addWood("Драконий Гребень", "Древесина из сердца драконьего дерева, даёт мощные заклинания");
+                addWood("Лунный Ясень", "Древесина, собранная в полнолуние, усиливает защитные заклинания");
+                addWood("Фениксовый Тис", "Редкая древесина, способная восстанавливаться после повреждений");
+            }
+            if (getAllCores().isEmpty()) {
+                addCore("Перо феникса", "Даёт палочке способность к самовосстановлению");
+                addCore("Сердце дракона", "Обеспечивает мощные атакующие заклинания");
+                addCore("Волос вейлы", "Усиливает магию предсказаний и ясновидения");
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при инициализации начальных данных");
+        }
+    }
+    
+    private void addWood(String name, String description) {
+        String sql = "INSERT INTO wood (name, description) VALUES (?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, description);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при добавлении вида древесины: " + name);
+        }
+    }
 
+    private void addCore(String name, String description) {
+        String sql = "INSERT INTO core (name, description) VALUES (?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, description);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при добавлении вида сердцевины: " + name);
+        }
+    }
+    
     // ========== ПОКУПАТЕЛИ ==========
     public boolean addBuyer(Buyer buyer) {
         String sql = "INSERT INTO buyer (first_name, last_name) VALUES (?, ?)";
@@ -169,7 +210,6 @@ public class DatabaseManager {
         return getWandsByStatus("sold");
     }
     
-        // Метод получения палочки по ID (вместо getWandByName)
     public Wand getWandById(int id) {
         String sql = "SELECT * FROM wand WHERE id = ?";
         try (Connection conn = getConnection();
@@ -193,7 +233,7 @@ public class DatabaseManager {
         return null;
     }
 
-        public boolean moveWandToShop(int wandId) {
+    public boolean moveWandToShop(int wandId) {
         String sql = "UPDATE wand SET status = 'in_shop' WHERE id = ? AND status = 'in_storage'";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -215,7 +255,6 @@ public class DatabaseManager {
             try (PreparedStatement updateStmt = conn.prepareStatement(updateWandSql);
                  PreparedStatement saleStmt = conn.prepareStatement(insertSaleSql)) {
 
-                // Обновляем статус палочки
                 updateStmt.setInt(1, wandId);
                 int updated = updateStmt.executeUpdate();
                 if (updated == 0) {
@@ -223,7 +262,6 @@ public class DatabaseManager {
                     return false;
                 }
 
-                // Записываем продажу
                 saleStmt.setInt(1, wandId);
                 saleStmt.setInt(2, buyerId);
                 saleStmt.setDate(3, new java.sql.Date(saleDate.getTime()));
@@ -320,7 +358,7 @@ public class DatabaseManager {
         } catch (SQLException e) {
             handleSQLException(e, "Ошибка при получении ID материала");
         }
-        return -1; // Возвращаем -1 если материал не найден
+        return -1;
     }
 
     // ========== ПРОДАЖИ ==========
@@ -389,13 +427,10 @@ public class DatabaseManager {
     public boolean clearAllData() {
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement()) {
-            // Отключаем проверку внешних ключей временно
             stmt.execute("SET session_replication_role = replica;");
             
-            // Очищаем таблицы в правильном порядке
             stmt.executeUpdate("TRUNCATE TABLE sale, supply, wand, buyer, wood, core RESTART IDENTITY CASCADE");
             
-            // Включаем проверку обратно
             stmt.execute("SET session_replication_role = DEFAULT;");
             return true;
         } catch (SQLException e) {
@@ -425,55 +460,5 @@ public class DatabaseManager {
     private void handleSQLException(SQLException e, String message) {
         System.err.println(message + ": " + e.getMessage());
         e.printStackTrace();
-    }
-    
-    public void initializeDefaultData() {
-        try (Connection conn = getConnection()) {
-            // Добавляем виды древесины, если таблица пуста
-            if (getAllWoods().isEmpty()) {
-                addWood("Драконий Гребень", "Древесина из сердца драконьего дерева, даёт мощные заклинания");
-                addWood("Лунный Ясень", "Древесина, собранная в полнолуние, усиливает защитные заклинания");
-                addWood("Фениксовый Тис", "Редкая древесина, способная восстанавливаться после повреждений");
-            }
-
-            // Добавляем виды сердцевин, если таблица пуста
-            if (getAllCores().isEmpty()) {
-                addCore("Перо феникса", "Даёт палочке способность к самовосстановлению");
-                addCore("Сердце дракона", "Обеспечивает мощные атакующие заклинания");
-                addCore("Волос вейлы", "Усиливает магию предсказаний и ясновидения");
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при инициализации начальных данных");
-        }
-    }
-
-    /**
-     * Вспомогательный метод для добавления древесины
-     */
-    private void addWood(String name, String description) {
-        String sql = "INSERT INTO wood (name, description) VALUES (?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            stmt.setString(2, description);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при добавлении вида древесины: " + name);
-        }
-    }
-
-    /**
-     * Вспомогательный метод для добавления сердцевины
-     */
-    private void addCore(String name, String description) {
-        String sql = "INSERT INTO core (name, description) VALUES (?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            stmt.setString(2, description);
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при добавлении вида сердцевины: " + name);
-        }
     }
 }
