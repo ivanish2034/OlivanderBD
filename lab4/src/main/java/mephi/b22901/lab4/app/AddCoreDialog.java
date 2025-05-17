@@ -13,16 +13,16 @@ import mephi.b22901.lab4.DatabaseManager;
  * @author ivis2
  */
 
-public class AddCoreDialog extends JDialog {
+public class AddCoreDialog extends AbstractDialog {
     private JTextField nameField;
     private JTextArea descriptionArea;
-    private JButton saveButton;
-    private DatabaseManager dbManager;
     
     public AddCoreDialog(JFrame parent, DatabaseManager dbManager) {
-        super(parent, "Добавить новый вид сердцевины", true);
-        this.dbManager = dbManager;
-        
+        super(parent, "Добавить новый вид сердцевины", dbManager);
+        initializeUI();
+    }
+    
+    private void initializeUI() {
         setLayout(new BorderLayout());
         setSize(400, 300);
         
@@ -38,7 +38,7 @@ public class AddCoreDialog extends JDialog {
         
         add(formPanel, BorderLayout.CENTER);
         
-        saveButton = new JButton("Сохранить");
+        JButton saveButton = new JButton("Сохранить");
         saveButton.addActionListener(e -> saveCore());
         add(saveButton, BorderLayout.SOUTH);
     }
@@ -48,7 +48,7 @@ public class AddCoreDialog extends JDialog {
         String description = descriptionArea.getText().trim();
         
         if (name.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Название сердцевины обязательно!");
+            showMessage("Название сердцевины обязательно!", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -59,10 +59,10 @@ public class AddCoreDialog extends JDialog {
             stmt.setString(1, name);
             stmt.setString(2, description);
             stmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Сердцевина успешно добавлена!");
+            showMessage("Сердцевина успешно добавлена!", "Успех", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Ошибка при сохранении: " + ex.getMessage());
+            showMessage("Ошибка при сохранении: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

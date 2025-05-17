@@ -65,6 +65,7 @@ public class DatabaseManager {
         }
     }
     
+    
     // ========== ПОКУПАТЕЛИ ==========
     public boolean addBuyer(Buyer buyer) {
         String sql = "INSERT INTO buyer (first_name, last_name) VALUES (?, ?)";

@@ -14,21 +14,17 @@ import mephi.b22901.lab4.Wand;
  * @author ivis2
  */
 
-public class AddWandDialog extends JDialog {
+public class AddWandDialog extends AbstractDialog {
     private JComboBox<String> cbWood;
     private JComboBox<String> cbCore;
     private JTextField txtLength;
     private JComboBox<String> cbFlexibility;
-    private DatabaseManager dbManager;
     private static final String[] FLEXIBILITY_OPTIONS = {
-        "Жесткая",
-        "Средняя",
-        "Гибкая",
-        "Очень гибкая"
+        "Жесткая", "Средняя", "Гибкая", "Очень гибкая"
     };
-    public AddWandDialog(JFrame parent) {
-        super(parent, "Добавить палочку", true);
-        this.dbManager = new DatabaseManager();
+
+    public AddWandDialog(JFrame parent, DatabaseManager dbManager) {
+        super(parent, "Добавить палочку", dbManager);
         initializeUI();
     }
     
@@ -52,7 +48,7 @@ public class AddWandDialog extends JDialog {
         add(txtLength);
 
         add(new JLabel("Гибкость:"));
-        cbFlexibility = new JComboBox<>(FLEXIBILITY_OPTIONS); // Инициализация комбобокса
+        cbFlexibility = new JComboBox<>(FLEXIBILITY_OPTIONS);
         add(cbFlexibility);
 
         JButton btnAdd = new JButton("Добавить");
@@ -66,27 +62,15 @@ public class AddWandDialog extends JDialog {
             int coreId = getSelectedId(cbCore, false);
 
             if (woodId == -1 || coreId == -1) {
-                JOptionPane.showMessageDialog(this, 
-                    "Ошибка: не удалось определить ID выбранных материалов", 
-                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+                showMessage("Не удалось определить ID выбранных материалов", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             String lengthText = txtLength.getText().trim();
-            double length;
-            try {
-                length = Double.parseDouble(lengthText);
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this,
-                        "Некорректное значение длины!",
-                        "Ошибка", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            double length = Double.parseDouble(lengthText);
 
             if (length <= 0 || length > 99) {
-                JOptionPane.showMessageDialog(this,
-                        "Длина палочки должна быть положительным числом не более 99!",
-                        "Ошибка", JOptionPane.ERROR_MESSAGE);
+                showMessage("Длина должна быть от 0 до 99", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -98,26 +82,20 @@ public class AddWandDialog extends JDialog {
             wand.setStatus("в наличии");
 
             if (dbManager.addWand(wand)) {
-                JOptionPane.showMessageDialog(this, "Палочка добавлена!");
+                showMessage("Палочка добавлена!", "Успех", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, 
-                    "Ошибка при добавлении палочки в БД", 
-                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+                showMessage("Ошибка при добавлении палочки", "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
+        } catch (NumberFormatException e) {
+            showMessage("Некорректное значение длины", "Ошибка", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, 
-                "Ошибка: " + ex.getMessage(), 
-                "Ошибка", JOptionPane.ERROR_MESSAGE);
+            showMessage("Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private int getSelectedId(JComboBox<String> comboBox, boolean isWood) {
         String selected = (String) comboBox.getSelectedItem();
-        if (isWood) {
-            return dbManager.getWoodIdByName(selected);
-        } else {
-            return dbManager.getCoreIdByName(selected);
-        }
+        return isWood ? dbManager.getWoodIdByName(selected) : dbManager.getCoreIdByName(selected);
     }
 }

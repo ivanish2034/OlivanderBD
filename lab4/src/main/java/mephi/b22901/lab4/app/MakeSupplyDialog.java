@@ -15,13 +15,11 @@ import mephi.b22901.lab4.Wand;
  * @author ivis2
  */
 
-public class MakeSupplyDialog extends JDialog {
+public class MakeSupplyDialog extends AbstractDialog {
     private JComboBox<Wand> cbWand;
-    private DatabaseManager dbManager;
 
-    public MakeSupplyDialog(JFrame parent) {
-        super(parent, "Перемещение палочки в магазин", true);
-        this.dbManager = new DatabaseManager();
+    public MakeSupplyDialog(JFrame parent, DatabaseManager dbManager) {
+        super(parent, "Перемещение палочки в магазин", dbManager);
         initializeUI();
     }
 
@@ -34,19 +32,7 @@ public class MakeSupplyDialog extends JDialog {
 
         add(new JLabel("Выберите палочку:"));
         cbWand = new JComboBox<>(new Vector<>(wands));
-        cbWand.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, 
-                    boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Wand) {
-                    Wand wand = (Wand) value;
-                    setText(String.format("ID: %d (Древесина: %d, Сердцевина: %d)", 
-                        wand.getId(), wand.getWoodId(), wand.getCoreId()));
-                }
-                return this;
-            }
-        });
+        cbWand.setRenderer(new WandComboBoxRenderer(dbManager));
         add(cbWand);
 
         JButton btnMove = new JButton("Переместить в магазин");
@@ -60,19 +46,16 @@ public class MakeSupplyDialog extends JDialog {
     private void moveToShop() {
         Wand selectedWand = (Wand) cbWand.getSelectedItem();
         if (selectedWand == null) {
-            JOptionPane.showMessageDialog(this, "Выберите палочку!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            showMessage("Выберите палочку!", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         if (dbManager.moveWandToShop(selectedWand.getId())) {
-            JOptionPane.showMessageDialog(this, 
-                "Палочка успешно перемещена в магазин!",
-                "Успех", JOptionPane.INFORMATION_MESSAGE);
+            showMessage("Палочка успешно перемещена в магазин!", "Успех", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, 
-                "Ошибка при перемещении палочки! Возможно, она уже была перемещена.",
-                "Ошибка", JOptionPane.ERROR_MESSAGE);
+            showMessage("Ошибка при перемещении палочки! Возможно, она уже была перемещена.",
+                      "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

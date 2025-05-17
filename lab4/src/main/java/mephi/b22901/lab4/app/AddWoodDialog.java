@@ -13,19 +13,20 @@ import mephi.b22901.lab4.DatabaseManager;
  * @author ivis2
  */
 
-public class AddWoodDialog extends JDialog {
+public class AddWoodDialog extends AbstractDialog {
     private JTextField nameField;
     private JTextArea descriptionArea;
-    private JButton saveButton;
-    private DatabaseManager dbManager;
-    
+
     public AddWoodDialog(JFrame parent, DatabaseManager dbManager) {
-        super(parent, "Добавить новый вид древесины", true);
-        this.dbManager = dbManager;
-        setLayout(new BorderLayout());
+        super(parent, "Добавить древесину", dbManager);
+        initializeUI();
+    }
+
+    private void initializeUI() {
+        setLayout(new BorderLayout(10, 10));
         setSize(400, 300);
-        
-        JPanel formPanel = new JPanel(new GridLayout(3, 1, 5, 5));
+
+        JPanel formPanel = new JPanel(new GridLayout(2, 1, 5, 5));
         
         formPanel.add(new JLabel("Название древесины:"));
         nameField = new JTextField();
@@ -36,10 +37,10 @@ public class AddWoodDialog extends JDialog {
         formPanel.add(new JScrollPane(descriptionArea));
         
         add(formPanel, BorderLayout.CENTER);
-        
-        saveButton = new JButton("Сохранить");
-        saveButton.addActionListener(e -> saveWood());
-        add(saveButton, BorderLayout.SOUTH);
+
+        JButton btnSave = new JButton("Сохранить");
+        btnSave.addActionListener(e -> saveWood());
+        add(btnSave, BorderLayout.SOUTH);
     }
 
     private void saveWood() {
@@ -47,7 +48,7 @@ public class AddWoodDialog extends JDialog {
         String description = descriptionArea.getText().trim();
         
         if (name.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Название древесины обязательно!");
+            showMessage("Название обязательно!", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -58,10 +59,11 @@ public class AddWoodDialog extends JDialog {
             stmt.setString(1, name);
             stmt.setString(2, description);
             stmt.executeUpdate();
-            JOptionPane.showMessageDialog(this, "Древесина успешно добавлена!");
+            showMessage("Древесина добавлена!", "Успех", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(this, "Ошибка при сохранении: " + ex.getMessage());
+            showMessage("Ошибка при сохранении: " + ex.getMessage(), 
+                       "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

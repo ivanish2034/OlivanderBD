@@ -13,14 +13,12 @@ import mephi.b22901.lab4.DatabaseManager;
  * @author ivis2
  */
 
-public class AddBuyerDialog extends JDialog {
+public class AddBuyerDialog extends AbstractDialog {
     private JTextField txtFirstName;
     private JTextField txtLastName;
-    private DatabaseManager dbManager;
 
-    public AddBuyerDialog(JFrame parent) {
-        super(parent, "Добавить покупателя", true);
-        this.dbManager = new DatabaseManager();
+    public AddBuyerDialog(JFrame parent, DatabaseManager dbManager) {
+        super(parent, "Добавить покупателя", dbManager);
         initializeUI();
     }
 
@@ -46,7 +44,7 @@ public class AddBuyerDialog extends JDialog {
         String lastName = txtLastName.getText().trim();
 
         if (firstName.isEmpty() || lastName.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Заполните все поля!");
+            showMessage("Заполните все поля!", "Ошибка", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -55,10 +53,10 @@ public class AddBuyerDialog extends JDialog {
         buyer.setLastName(lastName);
 
         if (dbManager.addBuyer(buyer)) {
-            JOptionPane.showMessageDialog(this, "Покупатель добавлен!");
+            showMessage("Покупатель добавлен!", "Успех", JOptionPane.INFORMATION_MESSAGE);
             dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Ошибка при добавлении!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            showMessage("Ошибка при добавлении!", "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

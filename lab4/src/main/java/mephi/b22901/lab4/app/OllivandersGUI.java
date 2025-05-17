@@ -99,30 +99,26 @@ public class OllivandersGUI {
     }
 
     private void showAddBuyerDialog() {
-        AddBuyerDialog dialog = new AddBuyerDialog(frame);
-        dialog.setVisible(true);
+        new AddBuyerDialog(frame, dbManager).showDialog();
+    }
+
+    private void showAddWoodDialog() {
+        new AddWoodDialog(frame, dbManager).showDialog();
+    }
+    private void showAddCoreDialog() {
+        new AddCoreDialog(frame, dbManager).showDialog();
     }
 
     private void showAddWandDialog() {
-        AddWandDialog dialog = new AddWandDialog(frame);
-        dialog.setVisible(true);
+        new AddWandDialog(frame, dbManager).showDialog();
     }
-    
-    private void showAddWoodDialog() {
-        AddWoodDialog dialog = new AddWoodDialog(frame, dbManager);
-        dialog.setVisible(true);
-    }
-
-    private void showAddCoreDialog() {
-        AddCoreDialog dialog = new AddCoreDialog(frame, dbManager);
-        dialog.setVisible(true);
-    }
-    
     private void showMoveToShopDialog() {
-        MakeSupplyDialog dialog = new MakeSupplyDialog(frame);
-        dialog.setVisible(true);
-    }
-    
+    new MakeSupplyDialog(frame, dbManager).showDialog();
+}
+
+private void showSellWandDialog() {
+    new SellWandDialog(frame, dbManager).showDialog();
+}
     private void trackStock() {
         StringBuilder stockInfo = new StringBuilder("=== Инвентаризация палочек ===\n\n");
         Map<Integer, String> woods = dbManager.getAllWoods();
@@ -172,12 +168,6 @@ public class OllivandersGUI {
 
         showScrollableMessage("Инвентаризация палочек", stockInfo.toString());
     }
-
-    private void showSellWandDialog() {
-        SellWandDialog dialog = new SellWandDialog(frame);
-        dialog.setVisible(true);
-    }
-
     private void showSalesReport() {
         List<Sale> sales = dbManager.getAllSales();
         StringBuilder report = new StringBuilder("=== Отчет о продажах ===\n\n");

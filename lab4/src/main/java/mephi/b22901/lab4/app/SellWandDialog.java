@@ -25,15 +25,92 @@ import mephi.b22901.lab4.Wand;
  * @author ivis2
  */
 
-public class SellWandDialog extends JDialog {
+//public class SellWandDialog extends JDialog {
+//    private JComboBox<Wand> cbWand;
+//    private JComboBox<Buyer> cbBuyer;
+//    private JDateChooser dateChooser;
+//    private DatabaseManager dbManager;
+//
+//    public SellWandDialog(JFrame parent) {
+//        super(parent, "Продать палочку", true);
+//        this.dbManager = new DatabaseManager();
+//        initializeUI();
+//    }
+//
+//    private void initializeUI() {
+//        setSize(400, 300);
+//        setLayout(new GridLayout(4, 2, 10, 10));
+//        
+//        List<Wand> availableWands = dbManager.getWandsInShop(); 
+//        List<Buyer> buyers = dbManager.getAllBuyers();
+//
+//        if (availableWands.isEmpty() || buyers.isEmpty()) {
+//            String message = availableWands.isEmpty() 
+//                ? "Нет палочек в магазине, готовых к продаже" 
+//                : "Нет зарегистрированных покупателей";
+//            JOptionPane.showMessageDialog(this, message, "Ошибка", JOptionPane.ERROR_MESSAGE);
+//            dispose();
+//            return;
+//        }
+//
+//        add(new JLabel("Выберите палочку:"));
+//        cbWand = new JComboBox<>(availableWands.toArray(new Wand[0]));
+//        cbWand.setRenderer(new WandComboBoxRenderer(dbManager));
+//        add(cbWand);
+//
+//        add(new JLabel("Выберите покупателя:"));
+//        cbBuyer = new JComboBox<>(buyers.toArray(new Buyer[0]));
+//        cbBuyer.setRenderer(new BuyerComboBoxRenderer());
+//        add(cbBuyer);
+//
+//        add(new JLabel("Дата продажи:"));
+//        dateChooser = new JDateChooser();
+//        dateChooser.setDate(new Date()); 
+//        add(dateChooser);
+//
+//        JButton btnSell = new JButton("Продать");
+//        btnSell.addActionListener(e -> sellWand());
+//        add(btnSell);
+//    }
+//
+//    private void sellWand() {
+//        try {
+//            Wand selectedWand = (Wand) cbWand.getSelectedItem();
+//            Buyer selectedBuyer = (Buyer) cbBuyer.getSelectedItem();
+//            Date saleDate = dateChooser.getDate();
+//
+//            if (selectedWand == null || selectedBuyer == null) {
+//                JOptionPane.showMessageDialog(this, "Выберите палочку и покупателя!");
+//                return;
+//            }
+//
+//            if (saleDate == null) {
+//                saleDate = new Date();
+//            }
+//
+//            if (dbManager.sellWand(selectedWand.getId(), selectedBuyer.getId(), saleDate)) {
+//                JOptionPane.showMessageDialog(this, "Палочка успешно продана!");
+//                dispose();
+//            } else {
+//                JOptionPane.showMessageDialog(this, 
+//                    "Ошибка при продаже палочки. Возможно, она уже была продана.",
+//                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+//            }
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(this, 
+//                "Произошла ошибка: " + e.getMessage(),
+//                "Ошибка", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
+//}
+//
+public class SellWandDialog extends AbstractDialog {
     private JComboBox<Wand> cbWand;
     private JComboBox<Buyer> cbBuyer;
     private JDateChooser dateChooser;
-    private DatabaseManager dbManager;
 
-    public SellWandDialog(JFrame parent) {
-        super(parent, "Продать палочку", true);
-        this.dbManager = new DatabaseManager();
+    public SellWandDialog(JFrame parent, DatabaseManager dbManager) {
+        super(parent, "Продать палочку", dbManager);
         initializeUI();
     }
 
@@ -48,7 +125,7 @@ public class SellWandDialog extends JDialog {
             String message = availableWands.isEmpty() 
                 ? "Нет палочек в магазине, готовых к продаже" 
                 : "Нет зарегистрированных покупателей";
-            JOptionPane.showMessageDialog(this, message, "Ошибка", JOptionPane.ERROR_MESSAGE);
+            showMessage(message, "Ошибка", JOptionPane.ERROR_MESSAGE);
             dispose();
             return;
         }
@@ -80,7 +157,7 @@ public class SellWandDialog extends JDialog {
             Date saleDate = dateChooser.getDate();
 
             if (selectedWand == null || selectedBuyer == null) {
-                JOptionPane.showMessageDialog(this, "Выберите палочку и покупателя!");
+                showMessage("Выберите палочку и покупателя!", "Ошибка", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -89,18 +166,14 @@ public class SellWandDialog extends JDialog {
             }
 
             if (dbManager.sellWand(selectedWand.getId(), selectedBuyer.getId(), saleDate)) {
-                JOptionPane.showMessageDialog(this, "Палочка успешно продана!");
+                showMessage("Палочка успешно продана!", "Успех", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
             } else {
-                JOptionPane.showMessageDialog(this, 
-                    "Ошибка при продаже палочки. Возможно, она уже была продана.",
-                    "Ошибка", JOptionPane.ERROR_MESSAGE);
+                showMessage("Ошибка при продаже палочки. Возможно, она уже была продана.",
+                          "Ошибка", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, 
-                "Произошла ошибка: " + e.getMessage(),
-                "Ошибка", JOptionPane.ERROR_MESSAGE);
+            showMessage("Произошла ошибка: " + e.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
-
