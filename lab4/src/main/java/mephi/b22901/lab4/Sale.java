@@ -12,8 +12,10 @@ import java.util.Date;
 
 public class Sale {
     private int id;
-    private int wandId;
-    private int buyerId;
+//    private int wandId;
+//    private int buyerId;
+    private Wand wand;      // Теперь объект вместо wandId
+    private Buyer buyer;    // Теперь объект вместо buyerId
     private Date saleDate;
     
     public int getId() {
@@ -23,21 +25,17 @@ public class Sale {
     public void setId(int id) {
         this.id = id;
     }
-
-    public int getWandId() {
-        return wandId;
+    public Wand getWand() { 
+        return wand; 
     }
-
-    public void setWandId(int wandId) {
-        this.wandId = wandId;
+    public void setWand(Wand wand) { 
+        this.wand = wand; 
     }
-
-    public int getBuyerId() {
-        return buyerId;
+    public Buyer getBuyer() { 
+        return buyer; 
     }
-
-    public void setBuyerId(int buyerId) {
-        this.buyerId = buyerId;
+    public void setBuyer(Buyer buyer) { 
+        this.buyer = buyer; 
     }
 
     public Date getSaleDate() {

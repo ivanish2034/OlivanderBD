@@ -13,8 +13,8 @@ public class Wand {
     private int id;
     private double length;
     private String flexibility;
-    private int woodId;
-    private int coreId;
+    private Wood wood;     
+    private Core core;     
     private String status = "in_storage"; 
 
     public int getId() {
@@ -41,20 +41,20 @@ public class Wand {
         this.flexibility = flexibility;
     }
 
-    public int getWoodId() {
-        return woodId;
+    public Wood getWood() { 
+        return wood; 
     }
-
-    public void setWoodId(int woodId) {
-        this.woodId = woodId;
+    
+    public void setWood(Wood wood) { 
+        this.wood = wood; 
     }
-
-    public int getCoreId() {
-        return coreId;
+    
+    public Core getCore() { 
+        return core; 
     }
-
-    public void setCoreId(int coreId) {
-        this.coreId = coreId;
+    
+    public void setCore(Core core) { 
+        this.core = core; 
     }
 
     public String getStatus() {

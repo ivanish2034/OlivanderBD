@@ -4,19 +4,21 @@
  */
 package mephi.b22901.lab4.app;
 
+import java.awt.GridLayout;
+import java.util.List;
 import javax.swing.*;
-import java.awt.*;
-import java.util.Map;
+import mephi.b22901.lab4.Core;
 import mephi.b22901.lab4.DatabaseManager;
 import mephi.b22901.lab4.Wand;
+import mephi.b22901.lab4.Wood;
+import mephi.b22901.lab4.app.renderer.*;
 /**
  *
  * @author ivis2
  */
-
 public class AddWandDialog extends AbstractDialog {
-    private JComboBox<String> cbWood;
-    private JComboBox<String> cbCore;
+    private JComboBox<Wood> cbWood;
+    private JComboBox<Core> cbCore;
     private JTextField txtLength;
     private JComboBox<String> cbFlexibility;
     private static final String[] FLEXIBILITY_OPTIONS = {
@@ -32,15 +34,17 @@ public class AddWandDialog extends AbstractDialog {
         setLayout(new GridLayout(6, 2, 10, 10));
         setSize(400, 250);
 
-        Map<Integer, String> woods = dbManager.getAllWoods();
-        Map<Integer, String> cores = dbManager.getAllCores();
+        List<Wood> woods = dbManager.getAllWoods();
+        List<Core> cores = dbManager.getAllCores();
 
         add(new JLabel("Древесина:"));
-        cbWood = new JComboBox<>(woods.values().toArray(new String[0]));
+        cbWood = new JComboBox<>(woods.toArray(new Wood[0]));
+        cbWood.setRenderer(new WoodComboBoxRenderer());
         add(cbWood);
 
         add(new JLabel("Сердцевина:"));
-        cbCore = new JComboBox<>(cores.values().toArray(new String[0]));
+        cbCore = new JComboBox<>(cores.toArray(new Core[0]));
+        cbCore.setRenderer(new CoreComboBoxRenderer());
         add(cbCore);
 
         add(new JLabel("Длина:"));
@@ -58,13 +62,8 @@ public class AddWandDialog extends AbstractDialog {
 
     private void addWand() {
         try {
-            int woodId = getSelectedId(cbWood, true);
-            int coreId = getSelectedId(cbCore, false);
-
-            if (woodId == -1 || coreId == -1) {
-                showMessage("Не удалось определить ID выбранных материалов", "Ошибка", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            Wood selectedWood = (Wood) cbWood.getSelectedItem();
+            Core selectedCore = (Core) cbCore.getSelectedItem();
 
             String lengthText = txtLength.getText().trim();
             double length = Double.parseDouble(lengthText);
@@ -75,11 +74,11 @@ public class AddWandDialog extends AbstractDialog {
             }
 
             Wand wand = new Wand();
-            wand.setWoodId(woodId);
-            wand.setCoreId(coreId);
+            wand.setWood(selectedWood);
+            wand.setCore(selectedCore);
             wand.setLength(length);
             wand.setFlexibility((String) cbFlexibility.getSelectedItem());
-            wand.setStatus("в наличии");
+            wand.setStatus("in_storage");
 
             if (dbManager.addWand(wand)) {
                 showMessage("Палочка добавлена!", "Успех", JOptionPane.INFORMATION_MESSAGE);
@@ -91,15 +90,6 @@ public class AddWandDialog extends AbstractDialog {
             showMessage("Некорректное значение длины", "Ошибка", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             showMessage("Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private int getSelectedId(JComboBox<String> comboBox, boolean isWood) {
-        String selected = (String) comboBox.getSelectedItem();
-        if (isWood) {
-            return dbManager.getWoodIdByName(selected);
-        } else {
-            return dbManager.getCoreIdByName(selected);
         }
     }
 }

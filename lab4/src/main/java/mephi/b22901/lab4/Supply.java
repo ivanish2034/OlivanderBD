@@ -11,7 +11,7 @@ package mephi.b22901.lab4;
 
 public class Supply {
     private int id;
-    private int wandId;
+    private Wand wand; 
 
     public int getId() {
         return id;
@@ -21,12 +21,10 @@ public class Supply {
         this.id = id;
     }
 
-    public int getWandId() {
-        return wandId;
+    public Wand getWand() { 
+        return wand; 
     }
-
-    public void setWandId(int wandId) {
-        this.wandId = wandId;
+    public void setWand(Wand wand) { 
+        this.wand = wand; 
     }
-
 }

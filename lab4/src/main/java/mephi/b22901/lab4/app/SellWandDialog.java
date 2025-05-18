@@ -18,7 +18,7 @@ import javax.swing.JOptionPane;
 import mephi.b22901.lab4.Buyer;
 import mephi.b22901.lab4.DatabaseManager;
 import mephi.b22901.lab4.Wand;
-
+import mephi.b22901.lab4.app.renderer.*;
 /**
  *
  * @author ivis2
@@ -51,7 +51,7 @@ public class SellWandDialog extends AbstractDialog {
 
         add(new JLabel("Выберите палочку:"));
         cbWand = new JComboBox<>(availableWands.toArray(new Wand[0]));
-        cbWand.setRenderer(new WandComboBoxRenderer(dbManager));
+        cbWand.setRenderer(new WandComboBoxRenderer());
         add(cbWand);
 
         add(new JLabel("Выберите покупателя:"));
