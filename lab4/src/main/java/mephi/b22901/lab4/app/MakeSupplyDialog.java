@@ -4,11 +4,13 @@
  */
 package mephi.b22901.lab4.app;
 
+import com.toedter.calendar.JDateChooser;
 import java.awt.*;
+import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 import javax.swing.*;
 import mephi.b22901.lab4.DatabaseManager;
+import mephi.b22901.lab4.Supply;
 import mephi.b22901.lab4.Wand;
 import mephi.b22901.lab4.app.renderer.*;
 /**
@@ -18,81 +20,71 @@ import mephi.b22901.lab4.app.renderer.*;
 
 public class MakeSupplyDialog extends AbstractDialog {
     private JComboBox<Wand> cbWand;
+    private JDateChooser dateChooser;
 
     public MakeSupplyDialog(JFrame parent, DatabaseManager dbManager) {
-        super(parent, "Перемещение палочки в магазин", dbManager);
+        super(parent, "Поставка палочки в магазин", dbManager);
         initializeUI();
     }
 
-//    private void initializeUI() {
-//        setLayout(new GridLayout(3, 2, 10, 10));
-//        setSize(400, 200);
-//        setLocationRelativeTo(getParent());
-//
-//        List<Wand> wands = dbManager.getWandsInStorage();
-//
-//        add(new JLabel("Выберите палочку:"));
-//        cbWand = new JComboBox<>(new Vector<>(wands));
-//        cbWand.setRenderer(new WandComboBoxRenderer());
-//        add(cbWand);
-//
-//        JButton btnMove = new JButton("Переместить в магазин");
-//        btnMove.addActionListener(e -> moveToShop());
-//        add(btnMove);
-//
-//        add(new JLabel());
-//        add(new JLabel());
-//    }
     private void initializeUI() {
-    setLayout(new GridBagLayout());
-    setSize(400, 200);
-    setLocationRelativeTo(getParent());
+        setSize(400, 200);
+        setLayout(new GridLayout(3, 2, 10, 10));
+        
+        List<Wand> availableWands = dbManager.getWandsInStorage();
 
-    List<Wand> wands = dbManager.getWandsInStorage();
-
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(10, 10, 10, 10);
-    gbc.gridx = 0;
-    gbc.gridy = 0;
-    gbc.anchor = GridBagConstraints.EAST;
-
-    // Метка "Выберите палочку:"
-    add(new JLabel("Выберите палочку:"), gbc);
-
-    // Комбобокс с палочками
-    gbc.gridx = 1;
-    gbc.anchor = GridBagConstraints.WEST;
-    cbWand = new JComboBox<>(new Vector<>(wands));
-    cbWand.setRenderer(new WandComboBoxRenderer());
-    add(cbWand, gbc);
-
-    // Кнопка "Переместить в магазин"
-    gbc.gridx = 0;
-    gbc.gridy = 1;
-    gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.CENTER;
-
-    JButton btnMove = new JButton("Переместить в магазин");
-    btnMove.addActionListener(e -> moveToShop());
-    add(btnMove, gbc);
-
-    // (если нужно добавить место для сообщения об ошибке/успехе, можно добавить JLabel ниже)
-}
-
-
-    private void moveToShop() {
-        Wand selectedWand = (Wand) cbWand.getSelectedItem();
-        if (selectedWand == null) {
-            showMessage("Выберите палочку!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+        if (availableWands.isEmpty()) {
+            showMessage("Нет палочек на складе для поставки", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            dispose();
             return;
         }
 
-        if (dbManager.moveWandToShop(selectedWand.getId())) {
-            showMessage("Палочка успешно перемещена в магазин!", "Успех", JOptionPane.INFORMATION_MESSAGE);
-            dispose();
-        } else {
-            showMessage("Ошибка при перемещении палочки! Возможно, она уже была перемещена.",
-                      "Ошибка", JOptionPane.ERROR_MESSAGE);
+        add(new JLabel("Выберите палочку:"));
+        cbWand = new JComboBox<>(availableWands.toArray(new Wand[0]));
+        cbWand.setRenderer(new WandComboBoxRenderer());
+        add(cbWand);
+
+        add(new JLabel("Дата поставки:"));
+        dateChooser = new JDateChooser();
+        dateChooser.setDate(new Date()); // Устанавливаем текущую дату по умолчанию
+        add(dateChooser);
+
+        JButton btnSupply = new JButton("Подтвердить поставку");
+        btnSupply.addActionListener(e -> processSupply());
+        add(btnSupply);
+    }
+
+    private void processSupply() {
+        try {
+            Wand selectedWand = (Wand) cbWand.getSelectedItem();
+            Date supplyDate = dateChooser.getDate();
+
+            if (selectedWand == null) {
+                showMessage("Выберите палочку!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (supplyDate == null) {
+                showMessage("Укажите дату поставки!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Supply supply = new Supply();
+            supply.setWand(selectedWand);
+            supply.setSupplyDate(supplyDate);
+
+            if (dbManager.addSupply(supply)) {
+                if (dbManager.moveWandToShop(selectedWand.getId())) {
+                    showMessage("Палочка успешно поставлена в магазин!", "Успех", JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                } else {
+                    showMessage("Ошибка при перемещении палочки в магазин", "Ошибка", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                showMessage("Ошибка при регистрации поставки", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            showMessage("Произошла ошибка: " + e.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

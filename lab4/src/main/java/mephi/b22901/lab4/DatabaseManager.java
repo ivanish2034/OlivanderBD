@@ -12,6 +12,7 @@ package mephi.b22901.lab4;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
+import javax.swing.JOptionPane;
 
 public class DatabaseManager {
     
@@ -290,40 +291,6 @@ public class DatabaseManager {
         }
     }
     
-    public boolean sellWand(int wandId, int buyerId, Date saleDate) {
-        String updateWandSql = "UPDATE wand SET status = 'sold' WHERE id = ? AND status = 'in_shop'";
-        String insertSaleSql = "INSERT INTO sale (wand_id, buyer_id, sale_date) VALUES (?, ?, ?)";
-
-        try (Connection conn = getConnection()) {
-            conn.setAutoCommit(false);
-
-            try (PreparedStatement updateStmt = conn.prepareStatement(updateWandSql);
-                 PreparedStatement saleStmt = conn.prepareStatement(insertSaleSql)) {
-
-                updateStmt.setInt(1, wandId);
-                int updated = updateStmt.executeUpdate();
-                if (updated == 0) {
-                    conn.rollback();
-                    return false;
-                }
-
-                saleStmt.setInt(1, wandId);
-                saleStmt.setInt(2, buyerId);
-                saleStmt.setDate(3, new java.sql.Date(saleDate.getTime()));
-                saleStmt.executeUpdate();
-
-                conn.commit();
-                return true;
-            } catch (SQLException e) {
-                conn.rollback();
-                throw e;
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при продаже палочки");
-            return false;
-        }
-    }
-    
     public int getWandStockQuantity(int wandId, String location) {
         String sql = "SELECT quantity FROM wand_stock WHERE wand_id = ? AND location = ?";
         try (Connection conn = getConnection();
@@ -426,10 +393,11 @@ public class DatabaseManager {
 
     // ========== ПОСТАВКИ ==========
     public boolean addSupply(Supply supply) {
-        String sql = "INSERT INTO supply (wand_id, quantity, supply_date, supplier) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO supply (wand_id, supply_date) VALUES (?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, supply.getWand().getId());
+            stmt.setDate(2, new java.sql.Date(supply.getSupplyDate().getTime()));
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -440,6 +408,61 @@ public class DatabaseManager {
             return true;
         } catch (SQLException e) {
             handleSQLException(e, "Ошибка при добавлении поставки");
+            return false;
+        }
+    }
+
+    public Date getWandSupplyDate(int wandId) {
+        String sql = "SELECT supply_date FROM supply WHERE wand_id = ? ORDER BY supply_date DESC LIMIT 1";
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, wandId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDate("supply_date");
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при получении даты поставки");
+        }
+        return null;
+    }
+
+    public boolean sellWand(int wandId, int buyerId, Date saleDate) {
+        Date supplyDate = getWandSupplyDate(wandId);
+        if (supplyDate != null && saleDate.before(supplyDate)) {
+            showMessage("Нельзя продать палочку до даты её поставки!", "Ошибка", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+
+        String updateWandSql = "UPDATE wand SET status = 'sold' WHERE id = ? AND status = 'in_shop'";
+        String insertSaleSql = "INSERT INTO sale (wand_id, buyer_id, sale_date) VALUES (?, ?, ?)";
+
+        try (Connection conn = getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement updateStmt = conn.prepareStatement(updateWandSql);
+                 PreparedStatement saleStmt = conn.prepareStatement(insertSaleSql)) {
+
+                updateStmt.setInt(1, wandId);
+                int updated = updateStmt.executeUpdate();
+                if (updated == 0) {
+                    conn.rollback();
+                    return false;
+                }
+
+                saleStmt.setInt(1, wandId);
+                saleStmt.setInt(2, buyerId);
+                saleStmt.setDate(3, new java.sql.Date(saleDate.getTime()));
+                saleStmt.executeUpdate();
+
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, "Ошибка при продаже палочки");
             return false;
         }
     }
@@ -460,26 +483,14 @@ public class DatabaseManager {
         }
     }
 
-    // ========== ИНФОРМАЦИЯ О СКЛАДЕ ==========
-//    public Map<String, Integer> getStockInfo(int wandId) {
-//        Map<String, Integer> stock = new HashMap<>();
-//        String sql = "SELECT location, quantity FROM wand_stock WHERE wand_id = ?";
-//        try (Connection conn = getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql)) {
-//            stmt.setInt(1, wandId);
-//            ResultSet rs = stmt.executeQuery();
-//            while (rs.next()) {
-//                stock.put(rs.getString("location"), rs.getInt("quantity"));
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e, "Ошибка при получении информации о запасах");
-//        }
-//        return stock;
-//    }
-
     // ========== ОБРАБОТКА ОШИБОК ==========
     private void handleSQLException(SQLException e, String message) {
         System.err.println(message + ": " + e.getMessage());
         e.printStackTrace();
     }
+
+    private void showMessage(String message, String title, int messageType) {
+        javax.swing.JOptionPane.showMessageDialog(null, message, title, messageType);
+    }
+
 }
