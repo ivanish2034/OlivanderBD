@@ -390,19 +390,16 @@ public class DatabaseManager {
                 Sale sale = new Sale();
                 sale.setId(rs.getInt("id"));
                 
-                // Создаем объект Wand
                 Wand wand = new Wand();
                 wand.setId(rs.getInt("wand_id"));
                 
                 Wood wood = new Wood();
                 wood.setId(rs.getInt("wood_id"));
                 wood.setName(rs.getString("wood_name"));
-                wood.setDescription(rs.getString("wood_desc"));
                 
                 Core core = new Core();
                 core.setId(rs.getInt("core_id"));
                 core.setName(rs.getString("core_name"));
-                core.setDescription(rs.getString("core_desc"));
                 
                 wand.setWood(wood);
                 wand.setCore(core);
@@ -410,7 +407,6 @@ public class DatabaseManager {
                 wand.setFlexibility(rs.getString("flexibility"));
                 wand.setStatus(rs.getString("status"));
                 
-                // Создаем объект Buyer
                 Buyer buyer = new Buyer();
                 buyer.setId(rs.getInt("buyer_id"));
                 buyer.setFirstName(rs.getString("first_name"));
@@ -465,21 +461,21 @@ public class DatabaseManager {
     }
 
     // ========== ИНФОРМАЦИЯ О СКЛАДЕ ==========
-    public Map<String, Integer> getStockInfo(int wandId) {
-        Map<String, Integer> stock = new HashMap<>();
-        String sql = "SELECT location, quantity FROM wand_stock WHERE wand_id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, wandId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                stock.put(rs.getString("location"), rs.getInt("quantity"));
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при получении информации о запасах");
-        }
-        return stock;
-    }
+//    public Map<String, Integer> getStockInfo(int wandId) {
+//        Map<String, Integer> stock = new HashMap<>();
+//        String sql = "SELECT location, quantity FROM wand_stock WHERE wand_id = ?";
+//        try (Connection conn = getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(sql)) {
+//            stmt.setInt(1, wandId);
+//            ResultSet rs = stmt.executeQuery();
+//            while (rs.next()) {
+//                stock.put(rs.getString("location"), rs.getInt("quantity"));
+//            }
+//        } catch (SQLException e) {
+//            handleSQLException(e, "Ошибка при получении информации о запасах");
+//        }
+//        return stock;
+//    }
 
     // ========== ОБРАБОТКА ОШИБОК ==========
     private void handleSQLException(SQLException e, String message) {

@@ -16,7 +16,6 @@ import java.awt.GridLayout;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Map;
 import mephi.b22901.lab4.Buyer;
 import mephi.b22901.lab4.DatabaseManager;
 import mephi.b22901.lab4.Sale;
@@ -121,83 +120,6 @@ public class OllivandersGUI {
     private void showSellWandDialog() {
         new SellWandDialog(frame, dbManager).showDialog();
     }
-    
-//    private void trackStock() {
-//        StringBuilder stockInfo = new StringBuilder("=== Инвентаризация палочек ===\n\n");
-//        Map<Integer, String> woods = dbManager.getAllWoods();
-//        Map<Integer, String> cores = dbManager.getAllCores();
-//
-//        stockInfo.append("=== На складе ===\n");
-//        List<Wand> storageWands = dbManager.getWandsInStorage();
-//        if (storageWands.isEmpty()) {
-//            stockInfo.append("Нет палочек на складе\n");
-//        } else {
-//            for (Wand wand : storageWands) {
-//                stockInfo.append(String.format("ID: %d | Древесина: %s | Сердцевина: %s | Длина: %.2f\" | Гибкость: %s\n",
-//                    wand.getId(), 
-//                    woods.get(wand.getWoodId()),
-//                    cores.get(wand.getCoreId()),
-//                    wand.getLength(),
-//                    wand.getFlexibility()));
-//            }
-//        }
-//        stockInfo.append("\n=== В магазине (готовы к продаже) ===\n");
-//        List<Wand> shopWands = dbManager.getWandsInShop();
-//        if (shopWands.isEmpty()) {
-//            stockInfo.append("Нет палочек в магазине\n");
-//        } else {
-//            for (Wand wand : shopWands) {
-//                stockInfo.append(String.format("ID: %d | Древесина: %s | Сердцевина: %s | Длина: %.2f\" | Гибкость: %s\n",
-//                    wand.getId(),
-//                    woods.get(wand.getWoodId()),
-//                    cores.get(wand.getCoreId()),
-//                    wand.getLength(),
-//                    wand.getFlexibility()));
-//            }
-//        }
-//        stockInfo.append("\n=== Проданные палочки ===\n");
-//        List<Wand> soldWands = dbManager.getSoldWands();
-//        if (soldWands.isEmpty()) {
-//            stockInfo.append("Нет проданных палочек\n");
-//        } else {
-//            for (Wand wand : soldWands) {
-//                stockInfo.append(String.format("ID: %d | Древесина: %s | Сердцевина: %s | Длина: %.2f\"\n",
-//                    wand.getId(),
-//                    woods.get(wand.getWoodId()),
-//                    cores.get(wand.getCoreId()),
-//                    wand.getLength()));
-//            }
-//        }
-//
-//        showScrollableMessage("Инвентаризация палочек", stockInfo.toString());
-//    }
-//    private void showSalesReport() {
-//        List<Sale> sales = dbManager.getAllSales();
-//        StringBuilder report = new StringBuilder("=== Отчет о продажах ===\n\n");
-//        Map<Integer, String> woods = dbManager.getAllWoods();
-//        Map<Integer, String> cores = dbManager.getAllCores();
-//        
-//        if (sales.isEmpty()) {
-//            report.append("Нет данных о продажах\n");
-//        } else {
-//            for (Sale sale : sales) {
-//                Wand wand = dbManager.getWandById(sale.getWandId());
-//                Buyer buyer = dbManager.getBuyerById(sale.getBuyerId());
-//                
-//                if (wand != null && buyer != null) {
-//                    report.append(String.format("Дата: %s | Палочка ID: %d (Древесина: %s, Сердцевина: %s) | Покупатель: %s %s\n",
-//                        sale.getSaleDate(), 
-//                        wand.getId(),
-//                        woods.get(wand.getWoodId()),
-//                        cores.get(wand.getCoreId()),
-//                        buyer.getFirstName(), 
-//                        buyer.getLastName()));
-//                }
-//            }
-//        }
-//
-//        showScrollableMessage("Отчет о продажах", report.toString());
-//    }
     
     private void trackStock() {
         StringBuilder stockInfo = new StringBuilder("=== Инвентаризация палочек ===\n\n");
