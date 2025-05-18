@@ -203,12 +203,6 @@ public class DatabaseManager {
 
     // ========== ПАЛОЧКИ ==========
     public boolean addWand(Wand wand) {
-//        String sql = "INSERT INTO wand (wood_id, core_id, length, flexibility, status) " +
-//                    "VALUES (?, ?, ?, ?, 'in_storage')";
-//        try (Connection conn = getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-//            stmt.setInt(1, wand.getWoodId());
-//            stmt.setInt(2, wand.getCoreId());
         String sql = "INSERT INTO wand (wood_id, core_id, length, flexibility, status) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -231,66 +225,7 @@ public class DatabaseManager {
             return false;
         }
     }
-    
-    public List<Wand> getAllWands() {
-        List<Wand> wands = new ArrayList<>();
-        String sql = "SELECT id, wood_id, core_id, length, flexibility, status FROM wand";
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Wand wand = new Wand();
-                wand.setId(rs.getInt("id"));
-//                wand.setWoodId(rs.getInt("wood_id"));
-//                wand.setCoreId(rs.getInt("core_id"));
-                // Создаем объекты Wood и Core
-                Wood wood = new Wood();
-                wood.setId(rs.getInt("wood_id"));
-//                wood.setName(rs.getString("wood_name"));
-//                wood.setDescription(rs.getString("wood_desc"));
-                
-                Core core = new Core();
-                core.setId(rs.getInt("core_id"));
-//                core.setName(rs.getString("core_name"));
-//                core.setDescription(rs.getString("core_desc"));
-                
-                wand.setWood(wood);
-                wand.setCore(core);
-                wand.setLength(rs.getDouble("length"));
-                wand.setFlexibility(rs.getString("flexibility"));
-                wand.setStatus(rs.getString("status"));
-                wands.add(wand);
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при получении палочек");
-        }
-        return wands;
-    }
 
-//    public List<Wand> getWandsByStatus(String status) {
-//        List<Wand> wands = new ArrayList<>();
-//        String sql = "SELECT * FROM wand WHERE status = ?";
-//
-//        try (Connection conn = getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql)) {
-//            stmt.setString(1, status);
-//            ResultSet rs = stmt.executeQuery();
-//
-//            while (rs.next()) {
-//                Wand wand = new Wand();
-//                wand.setId(rs.getInt("id"));
-//                wand.setWoodId(rs.getInt("wood_id"));
-//                wand.setCoreId(rs.getInt("core_id"));
-//                wand.setLength(rs.getDouble("length"));
-//                wand.setFlexibility(rs.getString("flexibility"));
-//                wand.setStatus(rs.getString("status"));
-//                wands.add(wand);
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e, "Ошибка при получении палочек по статусу");
-//        }
-//        return wands;
-//    }
     public List<Wand> getWandsByStatus(String status) {
         List<Wand> wands = new ArrayList<>();
         String sql = "SELECT w.*, wd.name as wood_name, wd.description as wood_desc, " +
@@ -312,12 +247,10 @@ public class DatabaseManager {
                 Wood wood = new Wood();
                 wood.setId(rs.getInt("wood_id"));
                 wood.setName(rs.getString("wood_name"));
-//                wood.setDescription(rs.getString("wood_desc"));
                 
                 Core core = new Core();
                 core.setId(rs.getInt("core_id"));
                 core.setName(rs.getString("core_name"));
-//                core.setDescription(rs.getString("core_desc"));
                 
                 wand.setWood(wood);
                 wand.setCore(core);
@@ -343,68 +276,6 @@ public class DatabaseManager {
     
     public List<Wand> getSoldWands() {
         return getWandsByStatus("sold");
-    }
-    
-//    public Wand getWandById(int id) {
-//        String sql = "SELECT * FROM wand WHERE id = ?";
-//        try (Connection conn = getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql)) {
-//            stmt.setInt(1, id);
-//            ResultSet rs = stmt.executeQuery();
-//            
-//            if (rs.next()) {
-//                Wand wand = new Wand();
-//                wand.setId(rs.getInt("id"));
-//                wand.setWoodId(rs.getInt("wood_id"));
-//                wand.setCoreId(rs.getInt("core_id"));
-//                wand.setLength(rs.getDouble("length"));
-//                wand.setFlexibility(rs.getString("flexibility"));
-//                wand.setStatus(rs.getString("status"));
-//                return wand;
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e, "Ошибка при получении палочки по ID");
-//        }
-//        return null;
-//    }
-    public Wand getWandById(int id) {
-        String sql = "SELECT w.*, wd.name as wood_name, wd.description as wood_desc, " +
-                     "c.name as core_name, c.description as core_desc " +
-                     "FROM wand w " +
-                     "JOIN wood wd ON w.wood_id = wd.id " +
-                     "JOIN core c ON w.core_id = c.id " +
-                     "WHERE w.id = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                Wand wand = new Wand();
-                wand.setId(rs.getInt("id"));
-                
-                Wood wood = new Wood();
-                wood.setId(rs.getInt("wood_id"));
-//                wood.setName(rs.getString("wood_name"));
-//                wood.setDescription(rs.getString("wood_desc"));
-                
-                Core core = new Core();
-                core.setId(rs.getInt("core_id"));
-//                core.setName(rs.getString("core_name"));
-//                core.setDescription(rs.getString("core_desc"));
-                
-                wand.setWood(wood);
-                wand.setCore(core);
-                wand.setLength(rs.getDouble("length"));
-                wand.setFlexibility(rs.getString("flexibility"));
-                wand.setStatus(rs.getString("status"));
-                
-                return wand;
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при получении палочки по ID");
-        }
-        return null;
     }
     
     public boolean moveWandToShop(int wandId) {
@@ -480,68 +351,11 @@ public class DatabaseManager {
         }
     }
 
-    // ========== ДРЕВЕСИНА И СЕРДЦЕВИНЫ ==========
-//    public Map<Integer, String> getAllWoods() {
-//        Map<Integer, String> woods = new HashMap<>();
-//        String sql = "SELECT id, name FROM wood";
-//        try (Connection conn = getConnection();
-//             Statement stmt = conn.createStatement();
-//             ResultSet rs = stmt.executeQuery(sql)) {
-//            while (rs.next()) {
-//                woods.put(rs.getInt("id"), rs.getString("name"));
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e, "Ошибка при получении видов древесины");
-//        }
-//        return woods;
-//    }
-//
-//    public Map<Integer, String> getAllCores() {
-//        Map<Integer, String> cores = new HashMap<>();
-//        String sql = "SELECT id, name FROM core";
-//        try (Connection conn = getConnection();
-//             Statement stmt = conn.createStatement();
-//             ResultSet rs = stmt.executeQuery(sql)) {
-//            while (rs.next()) {
-//                cores.put(rs.getInt("id"), rs.getString("name"));
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e, "Ошибка при получении видов сердцевин");
-//        }
-//        return cores;
-//    }
-
-    public int getWoodIdByName(String name) {
-        return getMaterialIdByName("wood", name);
-    }
-
-    public int getCoreIdByName(String name) {
-        return getMaterialIdByName("core", name);
-    }
-
-    private int getMaterialIdByName(String tableName, String name) {
-        String sql = "SELECT id FROM " + tableName + " WHERE name = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, name);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("id");
-                }
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, "Ошибка при получении ID материала");
-        }
-        return -1;
-    }
-
     // ========== ПРОДАЖИ ==========
     public boolean addSale(Sale sale) {
         String sql = "INSERT INTO sale (wand_id, buyer_id, sale_date) VALUES (?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-//            stmt.setInt(1, sale.getWandId());
-//            stmt.setInt(2, sale.getBuyerId());
             stmt.setInt(1, sale.getWand().getId());
             stmt.setInt(2, sale.getBuyer().getId());
             stmt.setDate(3, new java.sql.Date(sale.getSaleDate().getTime()));
@@ -613,25 +427,6 @@ public class DatabaseManager {
         }
         return sales;
     }
-//    public List<Sale> getAllSales() {
-//        List<Sale> sales = new ArrayList<>();
-//        String sql = "SELECT id, wand_id, buyer_id, sale_date FROM sale";
-//        try (Connection conn = getConnection();
-//             Statement stmt = conn.createStatement();
-//             ResultSet rs = stmt.executeQuery(sql)) {
-//            while (rs.next()) {
-//                Sale sale = new Sale();
-//                sale.setId(rs.getInt("id"));
-//                sale.setWandId(rs.getInt("wand_id"));
-//                sale.setBuyerId(rs.getInt("buyer_id"));
-//                sale.setSaleDate(rs.getDate("sale_date"));
-//                sales.add(sale);
-//            }
-//        } catch (SQLException e) {
-//            handleSQLException(e, "Ошибка при получении продаж");
-//        }
-//        return sales;
-//    }
 
     // ========== ПОСТАВКИ ==========
     public boolean addSupply(Supply supply) {
@@ -639,9 +434,6 @@ public class DatabaseManager {
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, supply.getWand().getId());
-//            stmt.setInt(2, supply.getQuantity());
-//            stmt.setDate(3, new java.sql.Date(supply.getSupplyDate().getTime()));
-//            stmt.setString(4, supply.getSupplier());
             stmt.executeUpdate();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -655,24 +447,6 @@ public class DatabaseManager {
             return false;
         }
     }
-//    public boolean addSupply(Supply supply) {
-//        String sql = "INSERT INTO supply (wand_id, quantity, supply_date, supplier) VALUES (?, ?, ?, ?)";
-//        try (Connection conn = getConnection();
-//             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-//            stmt.setInt(1, supply.getWandId());
-//            stmt.executeUpdate();
-//
-//            try (ResultSet rs = stmt.getGeneratedKeys()) {
-//                if (rs.next()) {
-//                    supply.setId(rs.getInt(1));
-//                }
-//            }
-//            return true;
-//        } catch (SQLException e) {
-//            handleSQLException(e, "Ошибка при добавлении поставки");
-//            return false;
-//        }
-//    }
 
     // ========== ОЧИСТКА ДАННЫХ ==========
     public boolean clearAllData() {
