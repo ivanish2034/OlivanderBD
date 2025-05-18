@@ -15,10 +15,10 @@ public class Wood {
 
     public Wood() {}
     
-    public Wood(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+//    public Wood(String name, String description) {
+//        this.name = name;
+//        this.description = description;
+//    }
 
     public int getId() { 
         return id; 

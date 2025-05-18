@@ -15,10 +15,10 @@ public class Core {
 
     public Core() {}
     
-    public Core(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
+//    public Core(String name, String description) {
+//        this.name = name;
+//        this.description = description;
+//    }
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

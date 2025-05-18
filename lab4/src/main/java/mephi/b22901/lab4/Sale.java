@@ -12,10 +12,8 @@ import java.util.Date;
 
 public class Sale {
     private int id;
-//    private int wandId;
-//    private int buyerId;
-    private Wand wand;      // Теперь объект вместо wandId
-    private Buyer buyer;    // Теперь объект вместо buyerId
+    private Wand wand;      
+    private Buyer buyer;    
     private Date saleDate;
     
     public int getId() {
