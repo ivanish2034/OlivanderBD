@@ -13,7 +13,7 @@ import mephi.b22901.lab4.app.OllivandersGUI;
 public class Lab4 {
 
     public static void main(String[] args) {
-SwingUtilities.invokeLater(new Runnable() {
+        SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 try {
                     OllivandersGUI window = new OllivandersGUI();
